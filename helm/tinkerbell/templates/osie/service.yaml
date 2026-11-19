@@ -1,6 +1,9 @@
 {{- if or .Values.optional.hookos.enabled .Values.optional.captainos.enabled }}
 {{- if and (not .Values.artifactsFileServer) (not .Values.artifactsFileServerV6) }}
-  {{- fail "artifactsFileServer or artifactsFileServerV6 must be set when an OSIE is enabled" }}
+  {{- $enabledOSIEs := list }}
+  {{- if .Values.optional.hookos.enabled }}{{- $enabledOSIEs = append $enabledOSIEs "optional.hookos" }}{{- end }}
+  {{- if .Values.optional.captainos.enabled }}{{- $enabledOSIEs = append $enabledOSIEs "optional.captainos" }}{{- end }}
+  {{- fail (printf "artifactsFileServer or artifactsFileServerV6 must be set because %s is enabled; if you don't need Tinkerbell's own OSIE-based OS-install pipeline, set %s.enabled=false instead" (join ", " $enabledOSIEs) (join ".enabled=false, " $enabledOSIEs)) }}
 {{- else }}
 {{- if ne (include "tinkerbell.osie.hostNetwork" .) "true" }}
 {{- $loadBalancerIPs := list }}
